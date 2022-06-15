@@ -601,9 +601,16 @@ router.post("/edit-employee/:id", function editEmployee(req, res) {
   var employeeId = req.params.id;
   var newUser = new User();
   newUser.email = req.body.email;
-  if (req.body.designation == "Accounts Manager") {
+  // <!-- PART OF: 1) We can set Manager to Employee -->
+  if (
+    req.body.designation == "Accounts Manager" ||
+    req.body.type == "accounts_manager"
+  ) {
     newUser.type = "accounts_manager";
-  } else if (req.body.designation == "Project Manager") {
+  } else if (
+    req.body.designation == "Project Manager" ||
+    req.body.type == "project_manager"
+  ) {
     newUser.type = "project_manager";
   } else {
     newUser.type = "employee";
@@ -637,9 +644,16 @@ router.post("/edit-employee/:id", function editEmployee(req, res) {
       });
     }
     user.email = req.body.email;
-    if (req.body.designation == "Accounts Manager") {
+
+    if (
+      req.body.designation == "Accounts Manager" ||
+      req.body.type == "accounts_manager"
+    ) {
       user.type = "accounts_manager";
-    } else if (req.body.designation == "Project Manager") {
+    } else if (
+      req.body.designation == "Project Manager" ||
+      req.body.type == "project_manager"
+    ) {
       user.type = "project_manager";
     } else {
       user.type = "employee";
