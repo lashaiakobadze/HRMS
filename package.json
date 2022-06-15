@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "nodemon ./bin/www",
+    "debug": "ndb app.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -22,6 +23,7 @@
     "mongoose": "^5.12.11",
     "mongoose-type-email": "^1.0.2",
     "morgan": "^1.10.0",
+    "ndb": "^1.1.5",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "serve-favicon": "^2.5.0"

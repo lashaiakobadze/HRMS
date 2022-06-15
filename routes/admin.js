@@ -797,6 +797,44 @@ router.post("/mark-attendance", function markAttendance(req, res, next) {
     }
   );
 });
+
+/**
+ * <!-- PART OF: 3) HR should have a ablibity to mark attandence for any employee -->
+ * Description:
+ * mark attendance employee.
+ *
+ * Known Bugs: None
+ */
+router.post("/mark-attendance-employee/:id", async (req, res, next) => {
+  await Attendance.find(
+    {
+      employeeID: req.params.id,
+      date: new Date().getDate(),
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear()
+    },
+    function getAttendance(err, docs) {
+      var found = 0;
+      if (docs.length > 0) {
+        found = 1;
+      } else {
+        var newAttendance = new Attendance();
+        newAttendance.employeeID = req.params.id;
+        newAttendance.year = new Date().getFullYear();
+        newAttendance.month = new Date().getMonth() + 1;
+        newAttendance.date = new Date().getDate();
+        newAttendance.present = 1;
+        newAttendance.save(function saveAttendance(err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+      }
+      res.redirect("/admin/view-attendance-current");
+    }
+  );
+});
+
 module.exports = router;
 
 /**
