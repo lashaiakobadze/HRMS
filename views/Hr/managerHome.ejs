@@ -44,18 +44,18 @@
         <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
 
             <li>
-                <a href="/manager/applied-leaves"><span class="fa-stack fa-lg pull-left"><i
-                                class="fa fa-dashboard fa-stack-1x "></i></span> View Leaves  from manager</a>
+                <a href="/hr-manager/applied-leaves"><span class="fa-stack fa-lg pull-left"><i
+                                class="fa fa-dashboard fa-stack-1x "></i></span> View Leaves</a>
             </li>
             <li>
-                <a href="/manager/view-employees">
+                <a href="/hr-manager/view-employees">
                     <button type="submit" style="background: transparent; border: transparent;"><i
                                 class="fa fa-users fa-lg " aria-hidden="true"></i> View Employees
                     </button>
                 </a>
             </li>
             <li>
-                <a href="/manager/apply-for-leave"><span class="fa-stack fa-lg pull-left"><i
+                <a href="/hr-manager/apply-for-leave"><span class="fa-stack fa-lg pull-left"><i
                                 class="fa fa-envelope-square fa-stack-1x "></i></span>Apply for Leave</a>
             </li>
             <li data-toggle="modal" data-target="#myModal">
@@ -67,7 +67,7 @@
                                 class="fa fa-check-circle fa-stack-1x "></i></span>Mark Attendance</a>
             </li>
             <li>
-                <a href="/manager/view-profile"><span class="fa-stack fa-lg pull-left"><i
+                <a href="/hr-manager/view-profile"><span class="fa-stack fa-lg pull-left"><i
                                 class="fa fa-user fa-stack-1x "></i></span>View Profile</a>
             </li>
         </ul>
@@ -104,7 +104,7 @@
 
 <div id="myModal2" class="modal fade" role="dialog">
     <div class="modal-dialog">
-        <form method="post" action="/manager/mark-manager-attendance">
+        <form method="post" action="/hr-manager/mark-manager-attendance">
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
@@ -130,7 +130,7 @@
 
         <!-- Modal content-->
         <div class="modal-content">
-            <form method="post" action="/manager/view-attendance">
+            <form method="post" action="/hr-manager/view-attendance">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Select Month/Year</h4>

@@ -15,6 +15,7 @@ var users = require("./routes/users");
 var admin = require("./routes/admin");
 var employee = require("./routes/employee");
 var manager = require("./routes/manager");
+var HRmanager = require("./routes/hr");
 
 expressValidator = require("express-validator");
 
@@ -61,6 +62,7 @@ app.use("/users", users);
 app.use("/admin", admin);
 app.use("/manager", manager);
 app.use("/employee", employee);
+app.use("/hr-manager", HRmanager);
 
 app.use(function (req, res, next) {
   res.locals.login = req.isAuthenticated();

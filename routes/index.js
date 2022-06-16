@@ -90,7 +90,7 @@ router.get("/check-type", function checkTypeOfLoggedInUser(req, res, next) {
   if (req.user.type == "project_manager") {
     res.redirect("/manager/");
   } else if (req.user.type == "accounts_manager") {
-    res.redirect("/manager/");
+    res.redirect("/hr-manager/");
   } else if (req.user.type == "employee") {
     res.redirect("/employee/");
   } else {

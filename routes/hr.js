@@ -28,8 +28,8 @@ router.use("/", isLoggedIn, function checkAuthentication(req, res, next) {
  */
 
 router.get("/", function viewHomePage(req, res, next) {
-  res.render("Manager/managerHome", {
-    title: "Manager Home",
+  res.render("Hr/managerHome", {
+    title: "Hr Home",
     csrfToken: req.csrfToken(),
     userName: req.session.user.name
   });
@@ -53,85 +53,70 @@ router.get("/", function viewHomePage(req, res, next) {
 router.get("/view-employees", function viewEmployees(req, res) {
   var userChunks = [];
   var chunkSize = 3;
-  if (req.user.type === "project_manager") {
-    //find is asynchronous function
-    User.find({ type: "employee" })
+
+  console.log("chunkSize", chunkSize);
+  if (req.user.type === "accounts_manager") {
+    // find is asynchronous function
+    var salaryChunks = [];
+
+    User.find({ $or: [{ type: "employee" }, { type: "project_manager" }] })
       .sort({ _id: -1 })
       .exec(function getUser(err, docs) {
+        if (err) {
+          console.log(err);
+        }
         for (var i = 0; i < docs.length; i++) {
           userChunks.push(docs[i]);
         }
-        res.render("Manager/viewemp_project", {
-          title: "List Of Employees",
-          csrfToken: req.csrfToken(),
-          users: userChunks,
-          errors: 0,
-          userName: req.session.user.name
-        });
       });
+
+    setTimeout(getUserSalaries, 900);
+
+    function getUserSalaries() {
+      function callback(i) {
+        if (i < userChunks.length) {
+          UserSalary.find(
+            { employeeID: userChunks[i]._id },
+            function (err, salary) {
+              console.log(i);
+
+              if (err) {
+                console.log(err);
+              }
+              if (salary.length > 0) {
+                salaryChunks.push(salary[0]);
+              } else {
+                var newSalary = new UserSalary();
+                newSalary.accountManagerID = req.session.user._id;
+                newSalary.employeeID = userChunks[i]._id;
+                newSalary.save(function (err) {
+                  if (err) {
+                    console.log(err);
+                  }
+                  salaryChunks.push(newSalary);
+                });
+              }
+
+              callback(i + 1);
+            }
+          );
+        }
+      }
+
+      callback(0);
+    }
+
+    setTimeout(render_view, 2000);
+    function render_view() {
+      res.render("Hr/allEmployeeView", {
+        title: "List Of Employees",
+        csrfToken: req.csrfToken(),
+        users: userChunks,
+        salary: salaryChunks,
+        userName: req.session.user.name
+      });
+    }
   }
-  // else if (req.user.type === "accounts_manager") {
-  //   //find is asynchronous function
-  //   var salaryChunks = [];
-
-  //   User.find({ $or: [{ type: "employee" }, { type: "project_manager" }] })
-  //     .sort({ _id: -1 })
-  //     .exec(function getUser(err, docs) {
-  //       if (err) {
-  //         console.log(err);
-  //       }
-  //       for (var i = 0; i < docs.length; i++) {
-  //         userChunks.push(docs[i]);
-  //       }
-  //     });
-
-  //   setTimeout(getUserSalaries, 900);
-
-  //   function getUserSalaries() {
-  //     function callback(i) {
-  //       if (i < userChunks.length) {
-  //         UserSalary.find(
-  //           { employeeID: userChunks[i]._id },
-  //           function (err, salary) {
-  //             console.log(i);
-
-  //             if (err) {
-  //               console.log(err);
-  //             }
-  //             if (salary.length > 0) {
-  //               salaryChunks.push(salary[0]);
-  //             } else {
-  //               var newSalary = new UserSalary();
-  //               newSalary.accountManagerID = req.session.user._id;
-  //               newSalary.employeeID = userChunks[i]._id;
-  //               newSalary.save(function (err) {
-  //                 if (err) {
-  //                   console.log(err);
-  //                 }
-  //                 salaryChunks.push(newSalary);
-  //               });
-  //             }
-
-  //             callback(i + 1);
-  //           }
-  //         );
-  //       }
-  //     }
-
-  //     callback(0);
-  //   }
-
-  //   setTimeout(render_view, 2000);
-  //   function render_view() {
-  //     // res.render("Manager/viewemp_accountant", {
-  //     //   title: "List Of Employees",
-  //     //   csrfToken: req.csrfToken(),
-  //     //   users: userChunks,
-  //     //   salary: salaryChunks,
-  //     //   userName: req.session.user.name
-  //     // });
-  //   }
-  // }
 });
 
 /**
@@ -153,7 +138,7 @@ router.get(
       if (err) {
         console.log(err);
       }
-      res.render("Manager/employeeSkills", {
+      res.render("Hr/employeeSkills", {
         title: "List Of Employee Skills",
         employee: user,
         moment: moment,
@@ -196,7 +181,7 @@ router.get(
           if (err) {
             console.log(err);
           }
-          res.render("Manager/employeeAllProjects", {
+          res.render("Hr/employeeAllProjects", {
             title: "List Of Employee Projects",
             hasProject: hasProject,
             projects: projectChunks,
@@ -232,7 +217,7 @@ router.get(
         if (err) {
           console.log(err);
         }
-        res.render("Manager/projectInfo", {
+        res.render("Hr/projectInfo", {
           title: "Employee Project Information",
           project: project,
           employee: user,
@@ -270,7 +255,7 @@ router.get(
             for (var i = 0; i < docs.length; i++) {
               userChunks.push(docs[i]);
             }
-            res.render("Manager/viewemp_project", {
+            res.render("Hr/allEmployeeView", {
               title: "List Of Employees",
               csrfToken: req.csrfToken(),
               users: userChunks,
@@ -283,7 +268,7 @@ router.get(
             if (err) {
               console.log(err);
             }
-            res.render("Manager/performance_appraisal", {
+            res.render("Hr/performance_appraisal", {
               title: "Provide Performance Appraisal",
               csrfToken: req.csrfToken(),
               employee: user,
@@ -327,7 +312,7 @@ router.get(
         for (var i = 0; i < docs.length; i++) {
           attendanceChunks.push(docs[i]);
         }
-        res.render("Manager/viewAttendance", {
+        res.render("Hr/viewAttendance", {
           title: "Attendance Sheet",
           month: new Date().getMonth() + 1,
           csrfToken: req.csrfToken(),
@@ -352,7 +337,7 @@ router.get(
  */
 
 router.get("/apply-for-leave", function applyForLeave(req, res, next) {
-  res.render("Manager/managerApplyForLeave", {
+  res.render("Hr/managerApplyForLeave", {
     title: "Apply for Leave",
     csrfToken: req.csrfToken(),
     userName: req.session.user.name
@@ -385,7 +370,7 @@ router.get("/applied-leaves", function appliedLeaves(req, res, next) {
         leaveChunks.push(docs[i]);
       }
 
-      res.render("Manager/managerAppliedLeaves", {
+      res.render("Hr/managerAppliedLeaves", {
         title: "List Of Applied Leaves",
         csrfToken: req.csrfToken(),
         hasLeave: hasLeave,
@@ -411,7 +396,7 @@ router.get("/view-profile", function viewProfile(req, res, next) {
     if (err) {
       console.log(err);
     }
-    res.render("Manager/viewManagerProfile", {
+    res.render("Hr/viewManagerProfile", {
       title: "Profile",
       csrfToken: req.csrfToken(),
       employee: user,
@@ -439,7 +424,7 @@ router.get("/view-project/:project_id", function viewProject(req, res, next) {
     if (err) {
       console.log(err);
     }
-    res.render("Manager/viewManagerProject", {
+    res.render("Hr/viewManagerProject", {
       title: "Project Details",
       project: project,
       csrfToken: req.csrfToken(),
@@ -474,7 +459,7 @@ router.get(
         for (var i = 0; i < docs.length; i++) {
           projectChunks.push(docs[i]);
         }
-        res.render("Manager/viewManagerPersonalProjects", {
+        res.render("Hr/viewManagerPersonalProjects", {
           title: "List Of Projects",
           hasProject: hasProject,
           projects: projectChunks,
@@ -532,7 +517,7 @@ router.get(
 
         setTimeout(render_view, 900);
         function render_view() {
-          res.render("Manager/generatePaySlip", {
+          res.render("Hr/generatePaySlip", {
             title: "Generate Pay Slip",
             csrfToken: req.csrfToken(),
             employee: user,
@@ -744,10 +729,10 @@ router.post("/generate-pay-slip", function generatePaySlip(req, res) {
  * Known Bugs: None
  */
 
-router.post("/view-attendance", function viewAttendance(req, res, next) {
+router.post("/view-attendance", async (req, res, next) => {
   var attendanceChunks = [];
-  Attendance.find({
-    employeeID: req.user._id,
+  await Attendance.find({
+    // employeeID: req.user._id,
     month: req.body.month,
     year: req.body.year
   })
@@ -760,7 +745,30 @@ router.post("/view-attendance", function viewAttendance(req, res, next) {
       for (var i = 0; i < docs.length; i++) {
         attendanceChunks.push(docs[i]);
       }
-      res.render("Manager/viewAttendance", {
+
+      attendanceChunks.forEach((attendance) => {
+        User.find({
+          _id: attendance.employeeID
+        }).exec(function mergeUser(err, user) {
+          if (user) {
+            // console.log("user", user[0]?.name);
+          }
+          // console.log("attendance with name: ", attendance);
+
+          let NewAttendance = {
+            _id: attendance._id,
+            employeeID: attendance.employeeID,
+            year: attendance.year,
+            month: attendance.month,
+            date: attendance.date,
+            present: attendance.present,
+            name: user[0]?.name
+          };
+          attendance = NewAttendance;
+          // console.log("attendance with name: ", attendance);
+        });
+      });
+      res.render("Hr/viewAttendance", {
         title: "Attendance Sheet",
         month: req.body.month,
         csrfToken: req.csrfToken(),
@@ -769,6 +777,8 @@ router.post("/view-attendance", function viewAttendance(req, res, next) {
         moment: moment,
         userName: req.session.user.name
       });
+
+      // console.log("attendanceChunks", attendanceChunks);
     });
 });
 
@@ -815,6 +825,43 @@ router.post(
     );
   }
 );
+
+/**
+ * <!-- PART OF: 3) HR should have a ablibity to mark attandence for any employee -->
+ * Description:
+ * mark attendance employee.
+ *
+ * Known Bugs: None
+ */
+router.post("/mark-attendance-employee/:id", async (req, res, next) => {
+  await Attendance.find(
+    {
+      employeeID: req.params.id,
+      date: new Date().getDate(),
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear()
+    },
+    function getAttendance(err, docs) {
+      var found = 0;
+      if (docs.length > 0) {
+        found = 1;
+      } else {
+        var newAttendance = new Attendance();
+        newAttendance.employeeID = req.params.id;
+        newAttendance.year = new Date().getFullYear();
+        newAttendance.month = new Date().getMonth() + 1;
+        newAttendance.date = new Date().getDate();
+        newAttendance.present = 1;
+        newAttendance.save(function saveAttendance(err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+      }
+      res.redirect("/hr-manager/view-attendance-current");
+    }
+  );
+});
 module.exports = router;
 
 function isLoggedIn(req, res, next) {

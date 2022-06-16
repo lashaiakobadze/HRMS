@@ -44,18 +44,18 @@
         <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
 
             <li>
-                <a href="/manager/applied-leaves"><span class="fa-stack fa-lg pull-left"><i
-                                class="fa fa-dashboard fa-stack-1x "></i></span> View Leaves  from manager</a>
+                <a href="/hr-manager/applied-leaves"><span class="fa-stack fa-lg pull-left"><i
+                                class="fa fa-dashboard fa-stack-1x "></i></span> View Leaves</a>
             </li>
             <li>
-                <a href="/manager/view-employees">
+                <a href="/hr-manager/view-employees">
                     <button type="submit" style="background: transparent; border: transparent;"><i
                                 class="fa fa-users fa-lg " aria-hidden="true"></i> View Employees
                     </button>
                 </a>
             </li>
             <li>
-                <a href="/manager/apply-for-leave"><span class="fa-stack fa-lg pull-left"><i
+                <a href="/hr-manager/apply-for-leave"><span class="fa-stack fa-lg pull-left"><i
                                 class="fa fa-envelope-square fa-stack-1x "></i></span>Apply for Leave</a>
             </li>
             <li data-toggle="modal" data-target="#myModal">
@@ -67,7 +67,7 @@
                                 class="fa fa-check-circle fa-stack-1x "></i></span>Mark Attendance</a>
             </li>
             <li>
-                <a href="/manager/view-profile"><span class="fa-stack fa-lg pull-left"><i
+                <a href="/hr-manager/view-profile"><span class="fa-stack fa-lg pull-left"><i
                                 class="fa fa-user fa-stack-1x "></i></span>View Profile</a>
             </li>
         </ul>
@@ -77,7 +77,75 @@
         <div class="container-fluid xyz">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1>Welcome!</h1>
+                    <h1>Pay Slip Details</h1>
+                    <br>
+                    <div id="menu1" style="overflow: auto;">
+                        <form action="/hr-manager/generate-pay-slip" method="post">
+                            <div class="form-group">
+                                <label for="bname">Bank Name:</label>
+                                <% if(hasPaySlip){ %>
+
+                                <input type="text" class="form-control" required="required"
+                                       value="<%= pay_slip.bankName %>" id="bname" name="bname">
+                                <% }else{ %>
+
+                                <input type="text" class="form-control" required="required" id="bname" name="bname">
+                                <% } %>
+                            </div>
+                            <div class="form-group">
+                                <label for="baddress">Branch Address:</label>
+                                <% if(hasPaySlip){ %>
+
+                                <input type="text" class="form-control" required="required"
+                                       value="<%= pay_slip.branchAddress %>" id="baddress" name="baddress">
+                                <% }else{ %>
+
+                                <input type="text" class="form-control" required="required" id="baddress"
+                                       name="baddress">
+                                <% } %>
+                            </div>
+                            <div class="form-group">
+                                <label for="pay">Basic Pay (RS):</label>
+                                <% if(hasPaySlip){ %>
+
+                                <input type="number" pattern="^[0-9]" title='Only Number' min="1" step="1" class="form-control" required="required"
+                                       value="<%= pay_slip.basicPay %>" id="pay" name="pay">
+                                <% }else{ %>
+
+                                <input type="number" pattern="^[0-9]" title='Only Number' min="1" step="1" class="form-control" required="required" id="pay" name="pay">
+                                <% } %>
+                            </div>
+                            <div class="form-group">
+                                <label for="otime">Over Time(hours):</label>
+                                <% if(hasPaySlip){ %>
+
+                                <input type="number" pattern="^[0-9]" title='Only Number' min="1" step="1" required="required" class="form-control"
+                                       value="<%= pay_slip.overtime %>" id="otime" name="otime">
+                                <% }else{ %>
+
+                                <input type="number" pattern="^[0-9]" title='Only Number' min="1" step="1" required="required" class="form-control" id="otime" name="otime">
+                                <% } %>
+                            </div>
+                            <div class="form-group">
+                                <label for="allowance">Conveyance Allowance(RS):</label>
+                                <% if(hasPaySlip){ %>
+                                <input type="number" required="required" pattern="^[0-9]" title='Only Number' min="1" step="1" class="form-control"
+                                       value="<%= pay_slip.conveyanceAllowance %>" id="allowance" name="allowance">
+                                <% }else{ %>
+                                <input type="number" pattern="^[0-9]" title='Only Number' min="1" step="1" required="required" class="form-control" id="allowance"
+                                       name="allowance">
+                                <% } %>
+
+                            </div>
+                            <br>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <input type="hidden" id="employee_id" name="employee_id" value="<%= pay_slip.employeeID %>">
+                            <button type="button" onclick="history.go(-1);" class="btn btn-default">Cancel</button>
+                            <button type="submit" data-toggle="modal" data-target="#myModal1" class="btn btn-default">
+                                Generate
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,7 +157,7 @@
 <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.js" charset="UTF-8"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js" charset="UTF-8"></script>
-
+<script src="/javascripts/confirmation.js"></script>
 
 <script src="/javascripts/sidebar_menu.js"></script>
 <script>
@@ -98,13 +166,41 @@
         for (i = new Date().getFullYear(); i > 1900; i--) {
             $('#year').append($('<option />').val(i).html(i));
         }
+        $('#pay').bind('keypress', function (e) {
+            if (e.which < 48 ||
+                    (e.which > 57 && e.which < 65) ||
+                    (e.which > 90 && e.which < 97) ||
+                    e.which > 122) {
+                e.preventDefault();
+            }
+
+        });
+        $('#allowance').bind('keypress', function (e) {
+            if (e.which < 48 ||
+                    (e.which > 57 && e.which < 65) ||
+                    (e.which > 90 && e.which < 97) ||
+                    e.which > 122) {
+                e.preventDefault();
+            }
+
+        });
+        $('#otime').bind('keypress', function (e) {
+            if (e.which < 48 ||
+                    (e.which > 57 && e.which < 65) ||
+                    (e.which > 90 && e.which < 97) ||
+                    e.which > 122) {
+                e.preventDefault();
+            }
+
+        });
+
     });
 </script>
 </body>
 
 <div id="myModal2" class="modal fade" role="dialog">
     <div class="modal-dialog">
-        <form method="post" action="/manager/mark-manager-attendance">
+        <form method="post" action="/hr-manager/mark-manager-attendance">
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
@@ -130,7 +226,7 @@
 
         <!-- Modal content-->
         <div class="modal-content">
-            <form method="post" action="/manager/view-attendance">
+            <form method="post" action="/hr-manager/view-attendance">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Select Month/Year</h4>
