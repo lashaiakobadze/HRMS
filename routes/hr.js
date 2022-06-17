@@ -78,8 +78,6 @@ router.get("/view-employees", function viewEmployees(req, res) {
           UserSalary.find(
             { employeeID: userChunks[i]._id },
             function (err, salary) {
-              console.log(i);
-
               if (err) {
                 console.log(err);
               }
@@ -107,8 +105,24 @@ router.get("/view-employees", function viewEmployees(req, res) {
     }
 
     setTimeout(render_view, 2000);
-    function render_view() {
-      res.render("Hr/allEmployeeView", {
+
+    // <!-- PART OF: 5) To calculate Salary based on Total working Days  -->
+    async function render_view() {
+      let userAttendanceCount = await Attendance.aggregate([
+        { $group: { _id: "$employeeID", count: { $sum: 1 } } }
+      ]);
+
+      userAttendanceCount.forEach((user) => {
+        let ourUser = salaryChunks.find((salary) => {
+          return salary.employeeID + "" == user._id + "";
+        });
+
+        if (ourUser) {
+          ourUser.salary = ourUser.salary * user.count;
+        }
+      });
+
+      res.render("Hr/viewemp_accountant", {
         title: "List Of Employees",
         csrfToken: req.csrfToken(),
         users: userChunks,
@@ -299,7 +313,7 @@ router.get(
     var attendanceChunks = [];
 
     Attendance.find({
-      employeeID: req.user._id,
+      // employeeID: req.user._id,
       month: new Date().getMonth() + 1,
       year: new Date().getFullYear()
     })
