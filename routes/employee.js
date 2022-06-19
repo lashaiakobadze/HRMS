@@ -6,9 +6,9 @@ var Project = require("../models/project");
 var moment = require("moment");
 var User = require("../models/user");
 var csrf = require("csurf");
-var csrfProtection = csrf();
 var moment = require("moment");
 var UserSalary = require("../models/user_salary");
+var request = require("request");
 
 router.use("/", isLoggedIn, function checkAuthentication(req, res, next) {
   next();
@@ -180,6 +180,27 @@ router.post("/view-monthly-profile", async (req, res, next) => {
     moment: moment,
     userName: req.session.user.name
   });
+});
+
+// <!-- PART OF: 6) Download PDF (table) monthly to view attendance / leave for all employees -->
+router.get("/get-monthly-pdf", (req, res, next) => {
+  var options = {
+    method: "GET",
+    url: "https://sandbox.esignlive.com/api/packages/Xs-rVmDCCHqiVLMyoaxwnceO8tI=/documents/zip",
+    headers: {
+      Authorization: "Basic QVRRxxxVA4TA==",
+      Accept: "application/pdf"
+    }
+  };
+
+  request(options)
+    .on("response", function (res) {
+      res.set({
+        "Content-Type": "application/zip",
+        "Content-Disposition": "attachment; filename=download.zip"
+      });
+    })
+    .pipe(res);
 });
 
 /**

@@ -74,6 +74,10 @@
     <div id="page-content-wrapper">
         <div class="container-fluid xyz">
             <div class="row">
+                <!-- PART OF: 6) Download PDF (table) monthly to view attendance / leave for all employees -->
+                <button id="get-pdf" type="button" style="margin-top: -3px;" class="btn btn-default"><i
+                    class="fa fa-user" aria-hidden="true"></i> Download monthly info
+                </button>
                 <div class="col-lg-12">
                     <!-- PART OF: 5) to caluculate Salary based on Total working Days -->
                     <h1>Salary based on Total working Days <%= userMonthlySalary %></h1><br>
@@ -202,6 +206,31 @@
         for (i = new Date().getFullYear(); i > 1900; i--) {
             $('#yearForMonthly').append($('<option />').val(i).html(i));
         }
+    });
+
+    // <!-- PART OF: 6) Download PDF (table) monthly to view attendance / leave for all employees -->
+    let getPdfButton = document.getElementById('get-pdf');
+
+    let getPdf = getPdfButton.addEventListener('click', () => {       
+        fetch('http://localhost:3000/employee/get-monthly-pdf')
+        .then(resp => {
+            const blob = resp.blob()
+            console.log(resp)
+            console.log(blob)
+            return blob
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'monthly-info.zip';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            alert('your file has downloaded!'); 
+        })
+        .catch(() => alert('oh no!'));
     });
 </script>
 </body>
