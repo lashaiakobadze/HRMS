@@ -65,7 +65,7 @@ router.get("/apply-for-leave", function applyForLeave(req, res, next) {
 router.get("/applied-leaves", function viewAppliedLeaves(req, res, next) {
   var leaveChunks = [];
 
-  //find is asynchronous function
+  // find is asynchronous function
   Leave.find({ applicantID: req.user._id })
     .sort({ _id: -1 })
     .exec(function getLeaves(err, docs) {
@@ -77,7 +77,8 @@ router.get("/applied-leaves", function viewAppliedLeaves(req, res, next) {
         leaveChunks.push(docs[i]);
       }
 
-      res.render("Employee/appliedLeaves", {
+      // <!-- PART OF: 2) Leave View should be Calender -->
+      res.render("calendar/calendar", {
         title: "List Of Applied Leaves",
         csrfToken: req.csrfToken(),
         hasLeave: hasLeave,
@@ -147,8 +148,8 @@ router.post("/view-monthly-profile", async (req, res, next) => {
 
   let attendanceChunks = await Attendance.find({
     employeeID: user._id,
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear()
+    month: req.body.month,
+    year: req.body.year
   });
 
   let userSalary = await UserSalary.find({ employeeID: user._id });
