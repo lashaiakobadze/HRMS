@@ -8,6 +8,7 @@ var User = require("../models/user");
 var csrf = require("csurf");
 var csrfProtection = csrf();
 var moment = require("moment");
+var UserSalary = require("../models/user_salary");
 
 router.use("/", isLoggedIn, function checkAuthentication(req, res, next) {
   next();
@@ -133,6 +134,7 @@ router.post("/view-attendance", function viewAttendanceSheet(req, res, next) {
 router.post("/view-monthly-profile", async (req, res, next) => {
   let foundTotalDays = 0;
   let foundTotalLeaves = 0;
+  let userMonthlySalary = 0;
 
   let user = await User.findById(
     req.session.user._id,
@@ -149,6 +151,8 @@ router.post("/view-monthly-profile", async (req, res, next) => {
     year: new Date().getFullYear()
   });
 
+  let userSalary = await UserSalary.find({ employeeID: user._id });
+
   let leaveChunks = await Leave.find({ applicantID: user._id });
 
   if (attendanceChunks.length) {
@@ -159,6 +163,11 @@ router.post("/view-monthly-profile", async (req, res, next) => {
     foundTotalLeaves = leaveChunks.length;
   }
 
+  //<!-- PART OF: 5) to caluculate Salary based on Total working Days -->
+  if (userSalary) {
+    userMonthlySalary = userSalary[0].salary * foundTotalDays;
+  }
+
   res.render("Employee/viewMonthlyProfile", {
     title: "Monthly profile",
     month: new Date().getMonth() + 1,
@@ -167,6 +176,7 @@ router.post("/view-monthly-profile", async (req, res, next) => {
     foundTotalLeaves: foundTotalLeaves,
     attendance: attendanceChunks,
     leave: leaveChunks,
+    userMonthlySalary: userMonthlySalary,
     moment: moment,
     userName: req.session.user.name
   });
