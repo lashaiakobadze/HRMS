@@ -126,6 +126,53 @@ router.post("/view-attendance", function viewAttendanceSheet(req, res, next) {
 });
 
 /**
+ * <!-- PART OF: 4) monthly , employee wise, list showing -->
+ * Description:
+ * Displays employee his/her full profile and information's.
+ */
+router.post("/view-monthly-profile", async (req, res, next) => {
+  let foundTotalDays = 0;
+  let foundTotalLeaves = 0;
+
+  let user = await User.findById(
+    req.session.user._id,
+    function getUser(err, user) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  );
+
+  let attendanceChunks = await Attendance.find({
+    employeeID: user._id,
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear()
+  });
+
+  let leaveChunks = await Leave.find({ applicantID: user._id });
+
+  if (attendanceChunks.length) {
+    foundTotalDays = attendanceChunks.length;
+  }
+
+  if (leaveChunks.length) {
+    foundTotalLeaves = leaveChunks.length;
+  }
+
+  res.render("Employee/viewMonthlyProfile", {
+    title: "Monthly profile",
+    month: new Date().getMonth() + 1,
+    csrfToken: req.csrfToken(),
+    foundTotalDays: foundTotalDays,
+    foundTotalLeaves: foundTotalLeaves,
+    attendance: attendanceChunks,
+    leave: leaveChunks,
+    moment: moment,
+    userName: req.session.user.name
+  });
+});
+
+/**
  * Description:
  * Display currently marked attendance to the user.
  *

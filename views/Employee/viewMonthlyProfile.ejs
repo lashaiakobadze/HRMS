@@ -1,3 +1,4 @@
+ <!-- PART OF: 4) monthly , employee wise, list showing -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,7 +43,7 @@
     <!-- Sidebar -->
     <div id="sidebar-wrapper">
         <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
-            <li data-toggle="modal" data-target="#myModalMonthly">
+            <li class="active" data-toggle="modal" data-target="#myModalMonthly">
                 <a href="#"><span class="fa-stack fa-lg pull-left"><i
                                 class="fa fa-dashboard fa-stack-1x "></i></span> View Monthly profile</a>
             </li>
@@ -63,7 +64,7 @@
                 <a href="#"><span class="fa-stack fa-lg pull-left"><i
                                 class="fa fa-check-circle fa-stack-1x "></i></span>Mark Attendance</a>
             </li>
-            <li class="active">
+            <li>
                 <a href="/employee/view-profile"><span class="fa-stack fa-lg pull-left"><i
                                 class="fa fa-user fa-stack-1x "></i></span>View Profile</a>
             </li>
@@ -74,39 +75,77 @@
         <div class="container-fluid xyz">
             <div class="row">
                 <div class="col-lg-12">
-                    <div id="menu1">
-                        <h1>Profile</h1>
-                        <br>
-                        <form class="form-group-sm" action="/employee/view-all-projects" method="get">
-                            <h4>Name : <label id="name"><%= employee.name %></label></h4>
-                            <h4>Email : <label id="type"><%= employee.email %></label></h4>
-                            <h4>Date of Birth : <label
-                                        id="dob"><%= moment(employee.dateOfBirth).format('MMMM Do YYYY') %></label></h4>
-                            <h4>Department : <label id="department"><%= employee.department %></label></h4>
-                            <h4>Designation : <label id="designation"><%= employee.designation %></label></h4>
-                            <h4>Projects : <label id="projects">
-                                    <button type="submit" class="form-control">View Projects</button>
-                                </label></h4>
+                    <h1>Monthly attendance <%= foundTotalDays %></h1><br>
+                    <div style="height:max-content; overflow: auto">
+                        <% if (foundTotalDays){ %>
+                        <table id="example" class="display" cellspacing="0" style="height: 10%; overflow: auto;">
+                            <thead>
+                            <tr>
+                                <th>Date</th> 
+                                <th>Status</th>
 
-                            <% if(employee.Skills.length > 0){ %>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <th>Date</th>
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            <% attendance.forEach(function(item){ %>
 
-                            <h4>Skills:</h4>
-                            <div style="height: 250px; overflow: auto;">
-                                <ul class="list-group" id="skills">
-                                    <%
-                                    employee.Skills.forEach(function(val){
-                                    if(val != ""){ %>
-                                    <li class="list-group-item"><%= val %></li>
+                            <tr>
+                                <td><%= moment(item.month + "/" + item.date + "/" + item.year).format('MMMM Do YYYY'); %></td>
+                                <td>Present</td>
 
-                                    <% }
-                                    }) %>
+                            </tr>
+                            <% }); %>
+                            </tbody>
+                        </table>
+                        <% }else{ %>
+                        <p> Unable to find attendance for given month and year</p>
+                        <% } %>
+                    </div>
 
-                                </ul>
-                            </div>
-                            <% }else{ %>
-                            <h4>Skills : <label id="skills">N/A</label></h4>
-                            <% } %>
-                        </form>
+                    <h1>Monthly Applied Leaves <%= foundTotalLeaves %></h1><br>
+                    <div style="height: max-content; overflow: auto">
+                        <% if(foundTotalLeaves){ %>
+                        <table id="example" class="display" cellspacing="0" style="height: 10%; overflow: auto;">
+                            <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Date of Application</th>
+                                <th>Period of Leave</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Applied Date</th>
+                                <th>Period of Leave</th>
+                                <th>Status</th>
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            <% leave.forEach(function(item){ %>
+                            <tr>
+                                <td><%= item.title %></td>
+                                <td><%= item.type %></td>
+                                <td><%= new Date(item.appliedDate).toISOString().substring(0, 10); %></td>
+                                <td><%= item.period %></td>
+                                <td><%= item.adminResponse %></td>
+                            </tr>
+
+                            <% }); %>
+
+                            </tbody>
+                        </table>
+                        <% }else{ %>
+                        <p>You have not applied for any leave.</p>
+                        <% } %>
                     </div>
                 </div>
             </div>
@@ -114,17 +153,44 @@
     </div>
     <!-- /#page-content-wrapper -->
 
+
 </div>
 <!-- /#wrapper -->
 <!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.js" charset="UTF-8"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.js" charset="UTF-8"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js" charset="UTF-8"></script>
-
-
+<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 <script src="/javascripts/sidebar_menu.js"></script>
 <script>
 
     $(document).ready(function () {
+        $('#example').dataTable({
+            /* No ordering applied by DataTables during initialisation */
+            "order": []
+        });
+        // Setup - add a text input to each footer cell
+        $('#example tfoot th').each(function () {
+            var title = $(this).text();
+            if (title != " ") {
+                $(this).html('<input type="text" class="form-control" placeholder="Search ' + title + '" />');
+            }
+        });
+
+        // DataTable
+        var table = $('#example').DataTable();
+
+        // Apply the search
+        table.columns().every(function () {
+            var that = this;
+
+            $('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that
+                            .search(this.value)
+                            .draw();
+                }
+            });
+        });
         for (i = new Date().getFullYear(); i > 1900; i--) {
             $('#year').append($('<option />').val(i).html(i));
         }
