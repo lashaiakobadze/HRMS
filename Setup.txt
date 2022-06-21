@@ -1,0 +1,36 @@
+This projects contains too many modules,
+We can see new added cod for project requirements with next steps:
+All new code which is added be me is committed and this commented code we can see such as:
+e.g <!-- PART OF: 5) to caluculate Salary based on Total working Days -->
+
+IMPORTANT NOTE:  If we use global search and we will search the pattern word "PART OF:" we will see all new added code.
+
+Step for first requirements
+requirement 1: We can set Manager to Employee
+1) We log in as an admin
+2) The admin has the right to appoint an employee as a manager.
+3) We can change this role when editing an employee.
+
+requirement 2: Leave View should be Calender
+1) We log in as an employee
+2) we go /employee/applied-leaves
+3) We can see all applied-leaves with calendar with red circle for applied-leaves and blue for current date.
+
+requirement 3: HR should have a ability to mark attendance for any employee
+1) We log in as an account-manager
+2) we go /hr-manager/view-employees
+3) we can see icon mark in employee's row for mark attendance.
+
+requirement 4: monthly , employee wise, total Days | leave |  total working days
+1) We log in as an employee
+2) we can see "view monthly profile" click and choose date. /employee/view-monthly-profile
+3) Here we can see monthly attendance, leaves, and Salary based on Total working Days also download button for pdf. 
+
+requirement 5: To calculate Salary based on Total working Days 
+this functionality is mentions with requirement 4;
+
+
+requirement 6: Download PDF (table) monthly to view attendance / leave for all employees
+1) Into "view monthly profile" we can see generate pdf button click
+2) After generate click we can download file from new page /employee/get-monthly-pdf
+3) this pdf contains minimal information main idea was functionality.
