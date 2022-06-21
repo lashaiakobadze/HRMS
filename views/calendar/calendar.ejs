@@ -77,13 +77,13 @@
           <div class="calendar-header">
               <span class="month-picker" id="month-picker">February</span>
               <div class="year-picker">
-                  <!-- <span class="year-change" id="prev-year">
+                  <span class="year-change" id="prev-year">
                       <pre><</pre>
-                  </span> -->
+                  </span>
                   <span id="year">2021</span>
-                  <!-- <span class="year-change" id="next-year">
+                  <span class="year-change" id="next-year">
                       <pre>></pre>
-                  </span> -->
+                  </span>
               </div>
           </div>
           <div class="calendar-body">
@@ -97,6 +97,51 @@
                   <div>Sat</div>
               </div>
               <div class="calendar-days"></div>
+              <h1>All Applied Leaves</h1><br>
+              <!-- PART OF: 2) Leave View should be Calender -->
+              <div>
+                  <% if(hasLeave === 1){ %> 
+                  <table id="example" class="display" cellspacing="0" style="height: 10%; overflow: auto;">
+                      <thead>
+                      <tr>
+                          <th>Title</th>
+                          <th>Type</th>
+                          <th>Date of Application</th>
+                          <th>Period of Leave</th>
+                          <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tfoot>
+                      <tr>
+                          <th>Title</th>
+                          <th>Type</th>
+                          <th>Applied Date</th>
+                          <th>Period of Leave</th>
+                          <th>Status</th>
+                      </tr>
+                      </tfoot>
+                      <tbody>
+                      <% leaves.forEach(function(item){ %>
+                      <tr>
+                          <td><%= item.title %></td>
+                          <td><%= item.type %></td>
+                          <td><%= new Date(item.appliedDate).toISOString().substring(0, 10); %></td>
+                          <td><%= item.period %></td>
+                          <td><%= item.adminResponse %></td>
+                      </tr>
+                      <div class="calendar-applied-days">
+                        <span class="start-date applied-days" data-item="<%= item.startDate %>"></span>
+                        <span class="end-date applied-days" data-item="<%= item.endDate %>"></span>
+                      </div>
+                      <% }); %>
+
+                      </tbody>
+                  </table>
+
+                  <% }else{ %>
+                  <p>You have not applied for any leave.</p>
+                  <% } %>
+              </div>
           </div>
           <div class="calendar-footer">
               <div class="toggle">
@@ -296,6 +341,7 @@
     --light-text: #151426;
 
     --blue: #0000ff;
+    --red: rgb(255, 3, 3);
     --white: #fff;
 
     --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -330,6 +376,7 @@
     align-items: center;
     justify-content: center;
     place-items: center;
+    height: calc(100vh - 200px);
     font-family: var(--font-family);
     background-color: var(--bg-body);
 }
@@ -347,6 +394,10 @@
 
 .light .calendar {
     box-shadow: var(--shadow);
+}
+
+.calendar-applied-days {
+    opacity: 0;
 }
 
 .calendar-header {
@@ -469,6 +520,18 @@
 }
 
 .calendar-days div.curr-date span {
+    display: none;
+}
+
+/* <!-- PART OF: 2) Leave View should be Calender --> */
+.calendar-days div.curr-leave-date,
+.calendar-days div.curr-leave-date:hover {
+    background-color: var(--red);
+    color: var(--white);
+    border-radius: 50%;
+}
+
+.calendar-days div.curr-leave-date span {
     display: none;
 }
 
@@ -596,8 +659,18 @@
 </style>
 
 <script>
-  let calendar = document.querySelector('.calendar')
+    let calendar = document.querySelector('.calendar');
+          // <!-- PART OF: 2) Leave View should be Calender -->
+    let appliedDaysQuery = document.querySelectorAll('.applied-days');
+    let appliedDays = [];
 
+    if (appliedDaysQuery) {
+        appliedDaysQuery.forEach(appliedDay => {
+            let appliedDayValue = appliedDay.getAttribute('data-item');
+            let appliedDayValueTime = new Date(appliedDayValue);
+            appliedDays.push(appliedDayValueTime);
+        });
+    }
 const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 isLeapYear = (year) => {
@@ -609,7 +682,6 @@ getFebDays = (year) => {
 }
 
 generateCalendar = (month, year) => {
-
     let calendar_days = calendar.querySelector('.calendar-days')
     let calendar_header_year = calendar.querySelector('#year')
 
@@ -639,7 +711,18 @@ generateCalendar = (month, year) => {
                             <span></span>
                             <span></span>`
             if (i - first_day.getDay() + 1 === currDate.getDate() && year === currDate.getFullYear() && month === currDate.getMonth()) {
-                day.classList.add('curr-date')
+                day.classList.add('curr-date');
+            }
+      // <!-- PART OF: 2) Leave View should be Calender -->
+            if (appliedDays) {
+                appliedDays.forEach(appliedDay => {
+                    let curAppliedDay = appliedDay.getDay();
+                    let curAppliedMonth = appliedDay.getMonth();
+
+                    if (i - first_day.getDay() + 1 === appliedDay.getDate() && year === appliedDay.getFullYear() && month === appliedDay.getMonth()) {
+                        day.classList.add('curr-leave-date');
+                    }
+                })
             }
         }
         calendar_days.appendChild(day)
