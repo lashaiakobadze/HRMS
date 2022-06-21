@@ -1,3 +1,15 @@
+Much of the project is taken from an existing well-known HRMS project that can be found in many places.
+I added features and requirements to this project,
+Which was part the final technical assignment of Node.Js Developers Training Course with New Horizons Computer Learning Centers and Georgia's Innovation and Technology Agency.
+
+Requirements:
+1) We can set Manager to Employee
+2) Leave View should be Calender 
+3) HR should have a ablibity to mark attandence for any employee 
+4) monthly , employee wise, list showing: Vivek | total Days | leave |  total working days  
+5) to caluculate Salary based on Total working Days 
+6)(Optional) Download PDF (table) monthly to view attendance / leave for all employees 
+
 ## Abstract:
 It is a web application which is a human resource management system. It keeps the information about the human resource, educational background of all employees, their  recent experiences, their attendance, their  leaves management and their current allocated projects. Administration panel will be created to manage all the information of hired employees. It will contain the statistics about the employee hiring ratio from different institutions and the average turnover of employees from different institutions. This project is built on Node Express which is is a web application framework for Node.js and the front end is created using HTML, Bootstrap, CSS and JS.  
 
